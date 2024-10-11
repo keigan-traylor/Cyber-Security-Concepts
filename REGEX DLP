@@ -1,0 +1,32 @@
+#REGEX example
+import os
+import re
+
+# Define regular expressions for sensitive data patterns
+email_pattern = re.compile(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}')
+credit_card_pattern = re.compile(r'\b(?:\d[ -]*?){13,16}\b')
+
+# Function to scan a file for sensitive data
+def scan_file(file_path):
+    with open(file_path, 'r', encoding='utf-8', errors='ignore') as file:
+        content = file.read()
+        emails = email_pattern.findall(content)
+        credit_cards = credit_card_pattern.findall(content)
+        return emails, credit_cards
+
+# Function to scan a directory for sensitive data
+def scan_directory(directory_path):
+    for root, _, files in os.walk(directory_path):
+        for file in files:
+            file_path = os.path.join(root, file)
+            emails, credit_cards = scan_file(file_path)
+            if emails or credit_cards:
+                print(f"Found sensitive data in {file_path}:")
+                if emails:
+                    print(f"  Emails: {emails}")
+                if credit_cards:
+                    print(f"  Credit Cards: {credit_cards}")
+
+# Example usage
+directory_path = 'path_to_your_directory'  # Replace with your directory path
+scan_directory(directory_path)
